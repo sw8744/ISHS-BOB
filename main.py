@@ -71,25 +71,25 @@ def load_bob(date: datetime.datetime):
 def upload(date):
     load_dotenv()
     date_time = datetime.datetime.strptime(date, "%Y%m%d")
-    if date_time.weekday() == 5 or date_time.weekday() == 6:
-        return
-    cl = Client()
-    cl.login(os.environ.get("INSTAGRAM_ID"), os.environ.get("INSTAGRAM_PW"))
-    print("Login success")
-    time.sleep(random.random() * 10)
-    cl.photo_upload_to_story('./img/' + date + '.png')
-    print("Upload success")
-    cl.logout()
+    try:
+        if date_time.weekday() == 5 or date_time.weekday() == 6:
+            return
+        cl = Client()
+        cl.login(os.environ.get("INSTAGRAM_ID"), os.environ.get("INSTAGRAM_PW"))
+        print("Login success")
+        time.sleep(random.random() * 10)
+        cl.photo_upload_to_story('./img/' + date + '.png')
+        print("Upload success")
+        cl.logout()
+    except Exception as e:
+        print(e)
 
-def schedule_load_bob():
+def schedule_f():
     load_bob(datetime.datetime.now().strftime("%Y%m%d"))
-
-def schedule_upload():
     upload(datetime.datetime.now().strftime("%Y%m%d"))
 
 if __name__ == "__main__":
-    schedule.every().day.at("00:00").do(schedule_load_bob)
-    schedule.every().day.at("00:01").do(schedule_upload)
+    schedule.every().day.at("00:00").do(schedule_f)
     while True:
         schedule.run_pending()
         time.sleep(1)
