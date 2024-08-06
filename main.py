@@ -85,6 +85,7 @@ def upload(date):
         print(e)
 
 def schedule_f():
+    print("Schedule start")
     load_bob(datetime.datetime.now().strftime("%Y%m%d"))
     upload(datetime.datetime.now().strftime("%Y%m%d"))
 
