@@ -88,6 +88,8 @@ def schedule_f():
     print("Schedule start")
     load_bob(datetime.datetime.now().strftime("%Y%m%d"))
     upload(datetime.datetime.now().strftime("%Y%m%d"))
+    print("Schedule end")
+    time.sleep(60)
 
 if __name__ == "__main__":
     while True:
