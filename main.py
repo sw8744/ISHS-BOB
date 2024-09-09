@@ -86,14 +86,16 @@ def upload(date):
 
 def schedule_f():
     print("Schedule start")
-    load_bob(datetime.datetime.now().strftime("%Y%m%d"))
-    upload(datetime.datetime.now().strftime("%Y%m%d"))
+    datetime_f = datetime.datetime.now() + datetime.timedelta(days=1)
+    datetime_str = datetime_f.strftime("%Y%m%d")
+    load_bob(datetime_str)
+    upload(datetime_str)
     print("Schedule end")
     time.sleep(60)
 
 if __name__ == "__main__":
     while True:
-        if datetime.datetime.now().hour == 0 and datetime.datetime.now().minute == 0:
+        if datetime.datetime.now().strftime("HH") == "23" and datetime.datetime.now().strftime("MM") == "30":
             schedule_f()
         else:
             continue
