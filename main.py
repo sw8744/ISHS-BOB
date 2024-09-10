@@ -95,7 +95,7 @@ def schedule_f():
 
 if __name__ == "__main__":
     while True:
-        if datetime.datetime.now().strftime("HH") == "23" and datetime.datetime.now().strftime("MM") == "30":
+        if datetime.datetime.now().hour == 23 and datetime.datetime.now().minute == 30:
             schedule_f()
         else:
             continue
