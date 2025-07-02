@@ -84,9 +84,9 @@ def upload(date):
     except Exception as e:
         print(e)
 
-def schedule_f():
+def make_bob(timedelta=1):
     print("Schedule start")
-    datetime_f = datetime.datetime.now() + datetime.timedelta(days=1)
+    datetime_f = datetime.datetime.now() + datetime.timedelta(days=timedelta)
     datetime_str = datetime_f.strftime("%Y%m%d")
     load_bob(datetime_str)
     upload(datetime_str)
@@ -94,10 +94,9 @@ def schedule_f():
     time.sleep(60)
 
 if __name__ == "__main__":
-    schedule_f()
     while True:
         if datetime.datetime.now().hour == 23 and datetime.datetime.now().minute == 30:
-            schedule_f()
+            make_bob()
         else:
             continue
         time.sleep(1)
