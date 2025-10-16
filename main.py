@@ -1,6 +1,7 @@
 import os
 import requests
 from instagrapi import Client
+from instagrapi.story import Path
 from dotenv import load_dotenv
 import json
 import datetime
@@ -9,14 +10,14 @@ import random
 import time
 
 def load_bob(date: datetime.datetime):
-    date_time = datetime.datetime.strptime(date, "%Y%m%d")
+    date_time = date.strftime("%Y%m%d")
     print(date_time)
     try:
-        if date_time.weekday() == 5 or date_time.weekday() == 6:
+        if date.weekday() == 5 or date.weekday() == 6:
             return
         load_dotenv()
         res = requests.get(
-            "https://open.neis.go.kr/hub/mealServiceDietInfo?KEY=7c8f58d4e4174b94b96b1aea5fb6fd0d&type=json&&ATPT_OFCDC_SC_CODE=E10&SD_SCHUL_CODE=7310058&MLSV_YMD=" + date)
+            "https://open.neis.go.kr/hub/mealServiceDietInfo?KEY=7c8f58d4e4174b94b96b1aea5fb6fd0d&type=json&&ATPT_OFCDC_SC_CODE=E10&SD_SCHUL_CODE=7310058&MLSV_YMD=" + date_time)
         res = json.loads(res.text)["mealServiceDietInfo"][1]["row"]
         changeName = {
             "조식": "아침",
@@ -25,7 +26,7 @@ def load_bob(date: datetime.datetime):
         }
         meal = []
         for i in res:
-            meal.append((changeName[i["MMEAL_SC_NM"]], i["DDISH_NM"].split("<br/>")))
+            meal.append([changeName[i["MMEAL_SC_NM"]]] + i["DDISH_NM"].split("<br/>"))
         print(meal)
         # 이미지 크기 설정
         width, height = 1080, 1920
@@ -50,12 +51,6 @@ def load_bob(date: datetime.datetime):
         x = (width - text_width) // 2
         y = 50
         draw.text((x, y), title, font=title_font, fill=text_color)
-        meal_time = ["< 아침 >", "< 점심 >", "< 저녁 >"]
-        date_time = datetime.datetime.strptime(date, "%Y%m%d")
-        if date_time.weekday() == 0:
-            meal_time = ["< 점심 >", "< 저녁 >"]
-        for i in range(len(meal)):
-            meal[i] = [meal_time[i]] + meal[i]
 
         for i in range(len(meal)):
             for j in range(len(meal[i])):
@@ -68,22 +63,24 @@ def load_bob(date: datetime.datetime):
                 else:
                     _, _, text_width, text_height = content_font.getbbox(text)
                     draw.text((x, y), text, font=content_font, fill=text_color)
-        image.save('img/' + date + '.png')
+        image.save('img/' + date_time + '.png')
         print("Image saved")
     except Exception as e:
         print(e)
 
-def upload(date):
+def upload(date: datetime.datetime):
     load_dotenv()
-    date_time = datetime.datetime.strptime(date, "%Y%m%d")
+    date_time = date.strftime("%Y%m%d")
     try:
-        if date_time.weekday() == 5 or date_time.weekday() == 6:
+        if date.weekday() == 5 or date.weekday() == 6:
             return
         cl = Client()
         cl.login(os.environ.get("INSTAGRAM_ID"), os.environ.get("INSTAGRAM_PW"))
         print("Login success")
         time.sleep(random.random() * 10)
-        cl.photo_upload_to_story('./img/' + date + '.png')
+        file_path = './img/' + date_time + '.png'
+        path = Path(file_path)
+        cl.photo_upload_to_story(path)
         print("Upload success")
         cl.logout()
     except Exception as e:
@@ -92,9 +89,8 @@ def upload(date):
 def make_bob(timedelta=1):
     print("Schedule start")
     datetime_f = datetime.datetime.now() + datetime.timedelta(days=timedelta)
-    datetime_str = datetime_f.strftime("%Y%m%d")
     load_bob(datetime_f)
-    upload(datetime_str)
+    upload(datetime_f)
     print("Schedule end")
     time.sleep(60)
 
