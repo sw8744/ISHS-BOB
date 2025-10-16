@@ -5,7 +5,6 @@ from dotenv import load_dotenv
 import json
 import datetime
 from PIL import Image, ImageDraw, ImageFont
-import schedule
 import random
 import time
 
@@ -16,11 +15,17 @@ def load_bob(date: datetime.datetime):
         if date_time.weekday() == 5 or date_time.weekday() == 6:
             return
         load_dotenv()
-        res = requests.get("https://open.neis.go.kr/hub/mealServiceDietInfo?KEY=" + os.environ.get("NEIS_KEY") + "&type=json&&ATPT_OFCDC_SC_CODE=E10&SD_SCHUL_CODE=7310058&MLSV_YMD=" + date)
+        res = requests.get(
+            "https://open.neis.go.kr/hub/mealServiceDietInfo?KEY=7c8f58d4e4174b94b96b1aea5fb6fd0d&type=json&&ATPT_OFCDC_SC_CODE=E10&SD_SCHUL_CODE=7310058&MLSV_YMD=" + date)
         res = json.loads(res.text)["mealServiceDietInfo"][1]["row"]
+        changeName = {
+            "조식": "아침",
+            "중식": "점심",
+            "석식": "저녁"
+        }
         meal = []
         for i in res:
-            meal.append(i["DDISH_NM"].split("<br/>"))
+            meal.append((changeName[i["MMEAL_SC_NM"]], i["DDISH_NM"].split("<br/>")))
         print(meal)
         # 이미지 크기 설정
         width, height = 1080, 1920
@@ -88,7 +93,7 @@ def make_bob(timedelta=1):
     print("Schedule start")
     datetime_f = datetime.datetime.now() + datetime.timedelta(days=timedelta)
     datetime_str = datetime_f.strftime("%Y%m%d")
-    load_bob(datetime_str)
+    load_bob(datetime_f)
     upload(datetime_str)
     print("Schedule end")
     time.sleep(60)
